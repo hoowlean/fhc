@@ -2,21 +2,25 @@ name: Update FireHOL to mihomo Rule-Sets
 
 on:
   schedule:
-    - cron: '0 4 * * *'      # 每天 UTC 时间 4:00 运行（北京时间中午 12:00）
-  workflow_dispatch:         # 允许你手动点击运行测试
+    - cron: '0 4 * * *'      # 每天北京时间中午 12:00 左右运行
+  workflow_dispatch:         # 允许手动触发
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # 必须加这个，才能让 Actions 有权限提交文件
+      contents: write
+
+    # 强制使用 Node.js 24，消除当前警告
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4   # 保持 v4（GitHub 正在逐步更新它）
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5   # 保持 v5（最新稳定版）
         with:
           python-version: '3.11'
 
