@@ -1,3 +1,7 @@
+# Generated from FireHOL firehol_level2 at 2026-04-09 03:37:24 UTC
+# Total records: 15029
+# https://iplists.firehol.org/
+
 payload:
 - 1.9.114.224/32
 - 1.12.217.80/32
