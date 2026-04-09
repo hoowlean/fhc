@@ -2,8 +2,8 @@ name: Update FireHOL to mihomo Rule-Sets
 
 on:
   schedule:
-    - cron: '0 4 * * *'      # 北京时间约 12:00
-  workflow_dispatch:
+    - cron: '0 4 * * *'        # 北京时间每天约 12:00 自动更新
+  workflow_dispatch:           # 允许手动触发
 
 jobs:
   update:
@@ -30,7 +30,7 @@ jobs:
       - name: Convert FireHOL lists
         run: python convert_1.py
 
-      - name: Commit and push if changed
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -38,9 +38,9 @@ jobs:
           git add *.yaml
           
           if git diff --cached --quiet; then
-            echo "文件内容没有变化，跳过提交"
+            echo "文件内容无变化，跳过提交"
           else
             git commit -m "Update FireHOL rule-sets $(date +'%Y-%m-%d %H:%M:%S UTC')"
             git push
-            echo "✅ 文件已成功更新并推送！"
+            echo "✅ FireHOL 规则集已成功更新并推送！"
           fi
