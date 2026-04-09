@@ -2,7 +2,7 @@ name: Update FireHOL to mihomo Rule-Sets
 
 on:
   schedule:
-    - cron: '0 4 * * *'      # 每天北京时间中午 12:00 左右
+    - cron: '0 4 * * *'      # UTC 4:00 ≈ 北京时间 12:00
   workflow_dispatch:
 
 jobs:
@@ -11,12 +11,11 @@ jobs:
     permissions:
       contents: write
 
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 关键修复：拉取完整历史，避免 git diff 判断错误
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,21 +35,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 检查是否有任何新文件或修改（包括全新创建的文件）
+          echo "=== 当前工作区状态 ==="
+          git status --porcelain *.yaml
+          
+          echo "=== 检查是否有差异（包括新文件）==="
           if git diff --quiet --exit-code HEAD -- *.yaml; then
             if git ls-files --others --exclude-standard | grep -q '\.yaml$'; then
               echo "检测到新创建的 YAML 文件，正在提交..."
               git add *.yaml
-              git commit -m "Update FireHOL rule-sets (new files) $(date +'%Y-%m-%d %H:%M:%S')"
+              git commit -m "Update FireHOL rule-sets (new files) $(date +'%Y-%m-%d %H:%M:%S UTC')"
               git push
-              echo "新文件已提交并推送"
+              echo "✅ 新文件已成功提交并推送！"
             else
-              echo "没有变化，跳过提交"
+              echo "文件内容没有实际变化，跳过提交"
             fi
           else
-            echo "检测到文件变化，正在提交..."
+            echo "检测到文件内容变化，正在提交..."
             git add *.yaml
-            git commit -m "Update FireHOL rule-sets $(date +'%Y-%m-%d %H:%M:%S')"
+            git commit -m "Update FireHOL rule-sets $(date +'%Y-%m-%d %H:%M:%S UTC')"
             git push
-            echo "变化已提交并推送"
+            echo "✅ 文件已成功更新并推送！"
           fi
